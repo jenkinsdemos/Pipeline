@@ -1,0 +1,17 @@
+pipeline {
+    agent { 
+        docker 
+            {   
+                //image 'ubuntu' 
+                image 'maven'
+            
+            } 
+    }
+    stages {
+        stage('build') {
+            steps {
+                sh 'mvn --version'
+            }
+        }
+    }
+}
