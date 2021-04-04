@@ -1,0 +1,120 @@
+Ex-1
+agent {
+    // Equivalent to "docker build -f Dockerfile.build --build-arg version=1.0.2 ./build/
+    dockerfile {
+        filename 'Dockerfile.build'
+        dir 'build'
+        label 'my-defined-label'
+        additionalBuildArgs  '--build-arg version=1.0.2'
+        args '-v /tmp:/tmp'
+    }
+}
+dockerfile also optionally accepts a registryUrl and registryCredentialsId parameters which will help to specify the Docker Registry to use and its credentials. For example:
+
+agent {
+    dockerfile {
+        filename 'Dockerfile.build'
+        dir 'build'
+        label 'my-defined-label'
+        registryUrl 'https://myregistry.com/'
+        registryCredentialsId 'myPredefinedCredentialsInJenkins'
+    }
+}
+
+
+
+Ex-2
+agent {
+    kubernetes {
+        label podlabel
+        yaml """
+kind: Pod
+metadata:
+  name: jenkins-agent
+spec:
+  containers:
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:debug
+    imagePullPolicy: Always
+    command:
+    - /busybox/cat
+    tty: true
+    volumeMounts:
+      - name: aws-secret
+        mountPath: /root/.aws/
+      - name: docker-registry-config
+        mountPath: /kaniko/.docker
+  restartPolicy: Never
+  volumes:
+    - name: aws-secret
+      secret:
+        secretName: aws-secret
+    - name: docker-registry-config
+      configMap:
+        name: docker-registry-config
+"""
+   }
+   
+   
+   
+
+Ex-3
+pipeline {
+    agent any
+    triggers {
+        cron('H */4 * * 1-5')
+    }
+    stages {
+        stage('Example') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+    }
+}
+
+
+Ex-4
+pipeline {
+    agent any
+    stages {
+        stage('Example') {
+            input {
+                message "Should we continue?"
+                ok "Yes, we should."
+                submitter "alice,bob"
+                parameters {
+                    string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
+                }
+            }
+            steps {
+                echo "Hello, ${PERSON}, nice to meet you."
+            }
+        }
+    }
+}
+
+
+
+Ex-5
+pipeline {
+    agent any
+    stages {
+        stage('Example Build') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+        stage('Example Deploy') {
+            when {
+                branch 'production'
+            }
+            steps {
+                echo 'Deploying'
+            }
+        }
+    }
+}
+
+
+Ex-6
