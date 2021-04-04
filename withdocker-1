@@ -1,3 +1,5 @@
+Ex-1
+
 pipeline {
     agent { 
         docker 
@@ -15,3 +17,47 @@ pipeline {
         }
     }
 }
+
+
+Ex-2
+pipeline {
+    agent {
+        docker {
+            image 'ubuntu'
+        }
+    }
+    stages {
+        stage('one') {
+            steps {
+                sh 'echo hello all > test.txt'
+            }
+        }
+    }
+}
+
+
+
+Ex-3 (this will fail but show the example)
+pipeline {
+    agent {
+        docker {
+            image 'maven'
+        }
+    }
+    stages {
+        stage('clonethecode') {
+            steps {
+                git 'https://github.com/jenkinsdemos/newmaven'
+            }
+        }
+        stage('build') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+    }
+}
+
+
+
+
